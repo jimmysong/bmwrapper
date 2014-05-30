@@ -13,7 +13,10 @@ class outgoingServer(SMTPServer):
         toAddress = msg['To']
         fromAddress = msg['From']
         subject = u' '.join(unicode(t[0], t[1] or 'UTF-8') for t in email.header.decode_header(msg['Subject'])).encode('UTF-8')
-        body = self._bmformat(msg)
+        if msg.is_multipart():
+            body = self._bmformat(msg)
+        else:
+            body = msg.get_payload()
         
         #Make sure we don't send an actually blank subject or body--this can cause problems.
         if not subject:
